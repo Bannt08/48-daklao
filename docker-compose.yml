@@ -1,0 +1,33 @@
+networks:
+  cafe_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+services:
+  # 1. Container Web Server (Ubuntu 22.04)
+  webserver:
+    build:
+      context: .                
+      dockerfile: ./webserver/Dockerfile
+    container_name: cafe_webserver
+    ports:
+      - "80:80"        
+      - "2222:22"      
+    networks:
+      cafe_network:
+        ipv4_address: 172.20.0.10
+    cap_add:
+      - SYS_ADMIN      
+    restart: always
+
+  internal-service:
+    build:
+      context: .
+      dockerfile: ./internal-service/Dockerfile
+    container_name: cafe_internal
+    networks:
+      cafe_network:
+        ipv4_address: 172.20.0.20
+    restart: always
